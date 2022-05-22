@@ -46,8 +46,22 @@ impl Matrix {
         }
     }
 
-    pub fn max_value(&self) -> f64 {
-        todo!()
+    pub fn max_value(&self) -> (usize, usize) {
+        let mut max_value: f64 = 0.0;
+        let mut max_value_row_index: usize = 0;
+        let mut max_value_col_index: usize = 0;
+
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                if self.entries[i][j] > max_value {
+                    max_value = self.entries[i][j];
+                    max_value_row_index = i;
+                    max_value_col_index = j;
+                }
+            }
+        }
+
+        (max_value_row_index, max_value_col_index)
     }
 }
 
@@ -94,7 +108,33 @@ mod matrix_methods_tests {
     }
 
     #[test]
-    fn max_value() {}
+    fn max_value() {
+        use rand::Rng;
+
+        let max_value: f64 = 999999.9999;
+
+        let mut ctrl_entries = Vec::<Vec<f64>>::new();
+        let mut ctrl_vec = Vec::<f64>::new();
+
+        let rows: usize = 5;
+        let cols: usize = 6;
+        for i in 0..rows {
+            ctrl_vec.clear();
+            for j in 0..cols {
+                if i == 4 && j == 3 {
+                    ctrl_vec.push(max_value);
+                    continue;
+                }
+                let rand_f64: f64 = rand::thread_rng().gen_range(0.0..500.0);
+                ctrl_vec.push(rand_f64);
+            }
+            ctrl_entries.push(ctrl_vec.clone());
+        }
+
+        let ctrl_matrix = Matrix::load(rows, cols, ctrl_entries);
+
+        assert_eq!(ctrl_matrix.max_value(), (4, 3));
+    }
 }
 
 pub fn save_matrix(matrix: &Matrix, file_name: &str) -> Result<(), String> {
@@ -200,4 +240,42 @@ pub fn randomize_matrix(matrix: &mut Matrix, demonenator: u64) {
             matrix.entries[i][j] = uniform_distribution(min, max);
         }
     }
+}
+
+pub enum Vector {
+    Row,
+    Column,
+}
+
+pub fn flatten_matrix(matrix: &Matrix, flag: Vector) -> Matrix {
+    let mut row_size: usize = 1;
+    let mut col_size: usize = 1;
+    match flag {
+        Vector::Row => {
+            row_size = matrix.rows * matrix.cols;
+            let mut flatten_matrix = Matrix::new(row_size, col_size);
+            flatten_matrix.fill(0.0);
+
+            for i in 0..matrix.rows {
+                for j in 0..matrix.cols {
+                    flatten_matrix.entries[i * matrix.cols + j][0] = matrix.entries[i][j];
+                }
+            }
+
+            return flatten_matrix;
+        }
+        Vector::Column => {
+            col_size = matrix.rows * matrix.cols;
+            let mut flatten_matrix = Matrix::new(row_size, col_size);
+            flatten_matrix.fill(0.0);
+
+            for i in 0..matrix.rows {
+                for j in 0..matrix.cols {
+                    flatten_matrix.entries[0][i * matrix.cols + j] = matrix.entries[i][j];
+                }
+            }
+
+            return flatten_matrix;
+        }
+    };
 }
