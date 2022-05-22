@@ -35,6 +35,19 @@ impl Matrix {
         }
     }
 
+    pub fn build(&mut self) {
+        if self.entries.is_empty() {
+            let mut filler_vec = Vec::<f64>::new();
+            for _ in 0..self.rows {
+                filler_vec.clear();
+                for _ in 0..self.cols {
+                    filler_vec.push(0.0);
+                }
+                self.entries.push(filler_vec.clone());
+            }
+        }
+    }
+
     pub fn fill(&mut self, filler_num: f64) {
         let mut filler_vec = Vec::<f64>::new();
         for _ in 0..self.rows {
