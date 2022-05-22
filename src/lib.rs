@@ -18,6 +18,59 @@ impl std::fmt::Display for Matrix {
     }
 }
 
+fn check_dimenstions(mat0: &Matrix, mat1: &Matrix) {
+    if !(mat0.rows == mat1.rows && mat0.cols == mat1.cols) {
+        panic!("The two matrixes dimensions do not match");
+    }
+}
+
+impl std::ops::Add for Matrix {
+    type Output = Matrix;
+
+    fn add(self, other: Self) -> Self {
+        check_dimenstions(&self, &other);
+
+        let mut new_matix = Matrix::new(self.rows, self.cols);
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                new_matix.entries[i][j] = self.entries[i][j] + other.entries[i][j];
+            }
+        }
+        new_matix
+    }
+}
+
+impl std::ops::Sub for Matrix {
+    type Output = Matrix;
+
+    fn sub(self, other: Self) -> Self {
+        check_dimenstions(&self, &other);
+
+        let mut new_matix = Matrix::new(self.rows, self.cols);
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                new_matix.entries[i][j] = self.entries[i][j] - other.entries[i][j];
+            }
+        }
+        new_matix
+    }
+}
+
+impl std::ops::Mul for Matrix {
+    type Output = Matrix;
+
+    fn mul(self, other: Self) -> Self {
+        check_dimenstions(&self, &other);
+
+        let mut new_matix = Matrix::new(self.rows, self.cols);
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                new_matix.entries[i][j] = self.entries[i][j] * other.entries[i][j];
+            }
+        }
+        new_matix
+    }
+}
 impl Matrix {
     pub fn new(rows: usize, cols: usize) -> Self {
         let mut build_entries = Vec::<Vec<f64>>::new();
