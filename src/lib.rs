@@ -20,42 +20,42 @@ impl std::fmt::Display for Matrix {
 
 impl Matrix {
     pub fn new(rows: usize, cols: usize) -> Self {
+        let mut build_entries = Vec::<Vec<f64>>::new();
+        let mut filler_vec = Vec::<f64>::new();
+        for _ in 0..rows {
+            filler_vec.clear();
+            for _ in 0..cols {
+                filler_vec.push(0.0);
+            }
+            build_entries.push(filler_vec.clone());
+        }
+
         Self {
-            entries: Vec::<Vec<f64>>::new(),
+            entries: build_entries,
             rows,
             cols,
         }
     }
 
-    fn load(rows: usize, cols: usize, entries: Vec<Vec<f64>>) -> Self {
-        Self {
+    fn load(entries: Vec<Vec<f64>>) -> Result<Self, String> {
+        if entries.is_empty() {
+            return Err("Cannot load an empty matrix".to_string());
+        }
+
+        let rows: usize = entries.len();
+        let cols: usize = entries[0].len();
+        Ok(Self {
             entries,
             rows,
             cols,
-        }
-    }
-
-    pub fn build(&mut self) {
-        if self.entries.is_empty() {
-            let mut filler_vec = Vec::<f64>::new();
-            for _ in 0..self.rows {
-                filler_vec.clear();
-                for _ in 0..self.cols {
-                    filler_vec.push(0.0);
-                }
-                self.entries.push(filler_vec.clone());
-            }
-        }
+        })
     }
 
     pub fn fill(&mut self, filler_num: f64) {
-        let mut filler_vec = Vec::<f64>::new();
-        for _ in 0..self.rows {
-            filler_vec.clear();
-            for _ in 0..self.cols {
-                filler_vec.push(filler_num);
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                self.entries[i][j] = filler_num;
             }
-            self.entries.push(filler_vec.clone());
         }
     }
 
@@ -85,10 +85,20 @@ mod matrix_methods_tests {
     #[test]
     fn new() {
         let new_matix = Matrix::new(3, 4);
+        let mut build_entries = Vec::<Vec<f64>>::new();
+        let mut filler_vec = Vec::<f64>::new();
+        for _ in 0..3 {
+            filler_vec.clear();
+            for _ in 0..4 {
+                filler_vec.push(0.0);
+            }
+            build_entries.push(filler_vec.clone());
+        }
+
         assert_eq!(
             new_matix,
             Matrix {
-                entries: Vec::<Vec<f64>>::new(),
+                entries: build_entries,
                 rows: 3,
                 cols: 4,
             }
@@ -97,14 +107,14 @@ mod matrix_methods_tests {
 
     #[test]
     fn fill() {
-        let mut new_matix = Matrix::new(3, 4);
+        let mut new_matix = Matrix::new(5, 7);
         new_matix.fill(0.5);
 
         let mut ctrl_entries = Vec::<Vec<f64>>::new();
         let mut ctrl_vec = Vec::<f64>::new();
-        for _ in 0..3 {
+        for _ in 0..5 {
             ctrl_vec.clear();
-            for _ in 0..4 {
+            for _ in 0..7 {
                 ctrl_vec.push(0.5);
             }
             ctrl_entries.push(ctrl_vec.clone());
@@ -114,10 +124,29 @@ mod matrix_methods_tests {
             new_matix,
             Matrix {
                 entries: ctrl_entries,
-                rows: 3,
-                cols: 4,
+                rows: 5,
+                cols: 7,
             }
         );
+    }
+
+    #[test]
+    fn load() {
+        let mut new_matix = Matrix::new(5, 7);
+        new_matix.fill(0.5);
+
+        let mut ctrl_entries = Vec::<Vec<f64>>::new();
+        let mut ctrl_vec = Vec::<f64>::new();
+        for _ in 0..5 {
+            ctrl_vec.clear();
+            for _ in 0..7 {
+                ctrl_vec.push(0.5);
+            }
+            ctrl_entries.push(ctrl_vec.clone());
+        }
+
+        let ctrl_matrix = Matrix::load(ctrl_entries).unwrap();
+        assert_eq!(new_matix, ctrl_matrix);
     }
 
     #[test]
@@ -144,7 +173,7 @@ mod matrix_methods_tests {
             ctrl_entries.push(ctrl_vec.clone());
         }
 
-        let ctrl_matrix = Matrix::load(rows, cols, ctrl_entries);
+        let ctrl_matrix = Matrix::load(ctrl_entries).unwrap();
 
         assert_eq!(ctrl_matrix.max_value(), (4, 3));
     }
@@ -157,8 +186,6 @@ pub fn save_matrix(matrix: &Matrix, file_name: &str) -> Result<(), String> {
     let file_path = Path::new(file_name);
 
     let mut write_buffer = String::new();
-    write_buffer.push_str(&format!("{}\n", matrix.rows.to_string()));
-    write_buffer.push_str(&format!("{}\n", matrix.cols.to_string()));
     write_buffer.push_str(&format!("{}", matrix));
     write(file_path, write_buffer).expect("failed to write to file");
 
@@ -185,33 +212,21 @@ pub fn load_matrix(file_name: &str) -> Result<Matrix, String> {
 
     let file_buffer = BufReader::new(file);
 
-    let mut count: usize = 0;
-    let mut row_size: usize = 0;
-    let mut cols_size: usize = 0;
     let mut build_matrix = Vec::<Vec<f64>>::new();
     let mut build_row = Vec::<f64>::new();
     for line in file_buffer.lines() {
-        if count == 0 {
-            row_size = line.unwrap().parse::<u32>().unwrap() as usize;
-            count += 1;
-        } else if count == 1 {
-            cols_size = line.unwrap().parse::<u32>().unwrap() as usize;
-            count += 1;
-        } else {
-            build_row.clear();
-            for value in line.unwrap().split(' ') {
-                let parsed_value = match value.parse::<f64>() {
-                    Ok(parsed_value) => parsed_value,
-                    Err(..) => break,
-                };
-                build_row.push(parsed_value);
-            }
-            build_matrix.push(build_row.clone());
-            count += 1;
+        build_row.clear();
+        for value in line.unwrap().split(' ') {
+            let parsed_value = match value.parse::<f64>() {
+                Ok(parsed_value) => parsed_value,
+                Err(..) => break,
+            };
+            build_row.push(parsed_value);
         }
+        build_matrix.push(build_row.clone());
     }
 
-    let new_matix = Matrix::load(row_size, cols_size, build_matrix);
+    let new_matix = Matrix::load(build_matrix).unwrap();
     Ok(new_matix)
 }
 

@@ -4,7 +4,6 @@ use matrix_math::{flatten_matrix, load_matrix, randomize_matrix, save_matrix, Ma
 fn main() {
     //build matrix funcs
     let mut new_matrix = Matrix::new(2, 3);
-    new_matrix.build();
     randomize_matrix(&mut new_matrix, 99);
     println!("matrix after randomize_matrix\n{}", new_matrix);
 
