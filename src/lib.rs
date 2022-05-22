@@ -1,5 +1,3 @@
-use std::{fmt, fs::write, fs::File, io::prelude::*, io::BufReader, path::Path};
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct Matrix {
     entries: Vec<Vec<f64>>,
@@ -7,8 +5,8 @@ pub struct Matrix {
     cols: usize,
 }
 
-impl fmt::Display for Matrix {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Display for Matrix {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut matrix_output: String = String::new();
         for rows in self.entries.iter() {
             for element in rows.iter() {
@@ -100,6 +98,9 @@ mod matrix_methods_tests {
 }
 
 pub fn save_matrix(matrix: &Matrix, file_name: &str) -> Result<(), String> {
+    use std::fs::write;
+    use std::path::Path;
+
     let file_path = Path::new(file_name);
 
     let mut write_buffer = String::new();
@@ -112,6 +113,10 @@ pub fn save_matrix(matrix: &Matrix, file_name: &str) -> Result<(), String> {
 }
 
 pub fn load_matrix(file_name: &str) -> Result<Matrix, String> {
+    use std::fs::File;
+    use std::io::{prelude::*, BufReader};
+    use std::path::Path;
+
     let file_path = Path::new(file_name);
     let file_path_string = file_path.display();
 
@@ -174,16 +179,21 @@ fn uniform_distribution(low: f64, high: f64) -> f64 {
     let difference = high - low;
     let scale: u64 = 10000;
 
-    let scaled_difference: u64 = difference as u64 * scale;
-    let rand_number: u64 = rand::thread_rng().gen_range(0..32767);
+    let scaled_difference: f64 = difference * scale as f64;
+    let rand_number: u64 = rand::thread_rng().gen_range(1..32767);
+
     let uniform_distribution: f64 =
-        low + ((1.0 as u64 * (rand_number % scaled_difference)) / scale) as f64;
+        low + ((1.0 * (rand_number as f64 % scaled_difference)) / scale as f64) as f64;
     uniform_distribution
 }
 
 pub fn randomize_matrix(matrix: &mut Matrix, demonenator: u64) {
     let min: f64 = -1.0 / (demonenator as f64).sqrt();
     let max: f64 = 1.0 / (demonenator as f64).sqrt();
+
+    if min == 0.0 || max == 0.0 {
+        println!("max or min is zero at start");
+    }
 
     for i in 0..matrix.rows {
         for j in 0..matrix.cols {
