@@ -47,6 +47,56 @@ impl Matrix {
             self.entries.push(filler_vec.clone());
         }
     }
+
+    pub fn max_value(&self) -> f64 {
+        todo!()
+    }
+}
+
+#[cfg(test)]
+mod matrix_methods_tests {
+    use super::*;
+
+    #[test]
+    fn new() {
+        let new_matix = Matrix::new(3, 4);
+        assert_eq!(
+            new_matix,
+            Matrix {
+                entries: Vec::<Vec<f64>>::new(),
+                rows: 3,
+                cols: 4,
+            }
+        );
+    }
+
+    #[test]
+    fn fill() {
+        let mut new_matix = Matrix::new(3, 4);
+        new_matix.fill(0.5);
+
+        let mut ctrl_entries = Vec::<Vec<f64>>::new();
+        let mut ctrl_vec = Vec::<f64>::new();
+        for _ in 0..3 {
+            ctrl_vec.clear();
+            for _ in 0..4 {
+                ctrl_vec.push(0.5);
+            }
+            ctrl_entries.push(ctrl_vec.clone());
+        }
+
+        assert_eq!(
+            new_matix,
+            Matrix {
+                entries: ctrl_entries,
+                rows: 3,
+                cols: 4,
+            }
+        );
+    }
+
+    #[test]
+    fn max_value() {}
 }
 
 pub fn save_matrix(matrix: &Matrix, file_name: &str) -> Result<(), String> {
@@ -108,50 +158,36 @@ pub fn load_matrix(file_name: &str) -> Result<Matrix, String> {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
+mod matrix_files_tests {
+    //use super::*;
 
     #[test]
-    fn new() {
-        let new_matix = Matrix::new(3, 4);
-        assert_eq!(
-            new_matix,
-            Matrix {
-                entries: Vec::<Vec<f64>>::new(),
-                rows: 3,
-                cols: 4,
-            }
-        );
-    }
+    fn save() {}
 
     #[test]
-    fn fill() {
-        let mut new_matix = Matrix::new(3, 4);
-        new_matix.fill(0.5);
+    fn load() {}
+}
 
-        let mut ctrl_entries = Vec::<Vec<f64>>::new();
-        let mut ctrl_vec = Vec::<f64>::new();
-        for _ in 0..3 {
-            ctrl_vec.clear();
-            for _ in 0..4 {
-                ctrl_vec.push(0.5);
-            }
-            ctrl_entries.push(ctrl_vec.clone());
+fn uniform_distribution(low: f64, high: f64) -> f64 {
+    use rand::prelude::*;
+
+    let difference = high - low;
+    let scale: u64 = 10000;
+
+    let scaled_difference: u64 = difference as u64 * scale;
+    let rand_number: u64 = rand::thread_rng().gen_range(0..32767);
+    let uniform_distribution: f64 =
+        low + ((1.0 as u64 * (rand_number % scaled_difference)) / scale) as f64;
+    uniform_distribution
+}
+
+pub fn randomize_matrix(matrix: &mut Matrix, demonenator: u64) {
+    let min: f64 = -1.0 / (demonenator as f64).sqrt();
+    let max: f64 = 1.0 / (demonenator as f64).sqrt();
+
+    for i in 0..matrix.rows {
+        for j in 0..matrix.cols {
+            matrix.entries[i][j] = uniform_distribution(min, max);
         }
-
-        assert_eq!(
-            new_matix,
-            Matrix {
-                entries: ctrl_entries,
-                rows: 3,
-                cols: 4,
-            }
-        );
-    }
-
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
     }
 }
