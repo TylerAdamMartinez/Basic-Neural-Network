@@ -71,6 +71,63 @@ impl std::ops::Mul for Matrix {
         new_matix
     }
 }
+
+#[cfg(test)]
+mod matrix_ops_tests {
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    fn mismatched_dimenstion_matrixes() {
+        let matrix0 = Matrix::new(4, 5);
+        let matrix1 = Matrix::new(5, 4);
+
+        let _sum_matrix = matrix0 + matrix1;
+    }
+
+    #[test]
+    fn add() {
+        let mut ctrl_matrix = Matrix::new(5, 5);
+        ctrl_matrix.fill(25.0);
+
+        let mut add0_matrix = Matrix::new(5, 5);
+        add0_matrix.fill(20.0);
+        let mut add1_matrix = Matrix::new(5, 5);
+        add1_matrix.fill(5.0);
+
+        let sum_matrix = add0_matrix + add1_matrix;
+        assert_eq!(ctrl_matrix, sum_matrix);
+    }
+
+    #[test]
+    fn sub() {
+        let mut ctrl_matrix = Matrix::new(2, 7);
+        ctrl_matrix.fill(75.6);
+
+        let mut sub0_matrix = Matrix::new(2, 7);
+        sub0_matrix.fill(25.0);
+        let mut sub1_matrix = Matrix::new(2, 7);
+        sub1_matrix.fill(100.6);
+
+        let sum_matrix = sub1_matrix - sub0_matrix;
+        assert_eq!(ctrl_matrix, sum_matrix);
+    }
+
+    #[test]
+    fn mul() {
+        let mut ctrl_matrix = Matrix::new(1, 2);
+        ctrl_matrix.fill(12.0);
+
+        let mut mul0_matrix = Matrix::new(1, 2);
+        mul0_matrix.fill(4.0);
+        let mut mul1_matrix = Matrix::new(1, 2);
+        mul1_matrix.fill(3.0);
+
+        let sum_matrix = mul1_matrix * mul0_matrix;
+        assert_eq!(ctrl_matrix, sum_matrix);
+    }
+}
+
 impl Matrix {
     pub fn new(rows: usize, cols: usize) -> Self {
         let mut build_entries = Vec::<Vec<f64>>::new();
