@@ -90,6 +90,16 @@ pub fn dot_product(mat0: &Matrix, mat1: &Matrix) -> Matrix {
     build_matrix
 }
 
+pub fn transpose(mat: &Matrix) -> Matrix {
+    let mut build_matrix = Matrix::new(mat.cols, mat.rows);
+    for i in 0..mat.rows {
+        for j in 0..mat.cols {
+            build_matrix.entries[j][i] = mat.entries[i][j];
+        }
+    }
+    build_matrix
+}
+
 #[cfg(test)]
 mod matrix_ops_tests {
     use super::*;
@@ -158,6 +168,18 @@ mod matrix_ops_tests {
         let sum_matrix = dot_product(&mul1_matrix, &mul0_matrix);
         assert_eq!(ctrl_matrix, sum_matrix);
     }
+
+    #[test]
+    fn transpose_test() {
+        let mut ctrl_matrix = Matrix::new(5, 2);
+        ctrl_matrix.fill(15.0);
+
+        let mut new_matrix = Matrix::new(2, 5);
+        new_matrix.fill(15.0);
+
+        let transpose_matrix = transpose(&new_matrix);
+        assert_eq!(ctrl_matrix, transpose_matrix);
+    }
 }
 
 impl Matrix {
@@ -217,6 +239,22 @@ impl Matrix {
         }
 
         (max_value_row_index, max_value_col_index)
+    }
+
+    pub fn scale(&mut self, scale_factor: f64) {
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                self.entries[i][j] *= scale_factor;
+            }
+        }
+    }
+
+    pub fn add_scalar(&mut self, scalar: f64) {
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                self.entries[i][j] += scalar;
+            }
+        }
     }
 }
 
@@ -318,6 +356,28 @@ mod matrix_methods_tests {
         let ctrl_matrix = Matrix::load(ctrl_entries).unwrap();
 
         assert_eq!(ctrl_matrix.max_value(), (4, 3));
+    }
+
+    #[test]
+    fn scale() {
+        let mut ctrl_matrix = Matrix::new(5, 7);
+        ctrl_matrix.fill(35.0);
+
+        let mut new_matrix = Matrix::new(5, 7);
+        new_matrix.fill(7.0);
+        new_matrix.scale(5.0);
+        assert_eq!(new_matrix, ctrl_matrix);
+    }
+
+    #[test]
+    fn add_scalar() {
+        let mut ctrl_matrix = Matrix::new(5, 7);
+        ctrl_matrix.fill(47.0);
+
+        let mut new_matrix = Matrix::new(5, 7);
+        new_matrix.fill(40.0);
+        new_matrix.add_scalar(7.0);
+        assert_eq!(new_matrix, ctrl_matrix);
     }
 }
 
