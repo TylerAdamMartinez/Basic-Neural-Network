@@ -42,6 +42,6 @@ mod image_tests {
     }
 }
 
-pub fn csv_to_images(file_path: &str, number_of_images: usize) -> Vec<Image> {
+pub fn csv_to_images(file_path: &str, number_of_images: usize) -> Result<Vec<Image>, String> {
     todo!()
 }
