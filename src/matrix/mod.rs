@@ -1,6 +1,6 @@
 #[derive(Debug, Clone, PartialEq)]
 pub struct Matrix {
-    entries: Vec<Vec<f64>>,
+    pub entries: Vec<Vec<f64>>,
     rows: usize,
     cols: usize,
 }
