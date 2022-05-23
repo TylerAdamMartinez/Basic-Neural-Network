@@ -509,3 +509,15 @@ pub fn flatten_matrix(matrix: &Matrix, flag: Vector) -> Matrix {
         }
     };
 }
+
+pub fn apply(applied_func: fn(f64) -> f64, matrix: &Matrix) -> Matrix {
+    let mut applied_matrix = matrix.clone();
+
+    for i in 0..applied_matrix.rows {
+        for j in 0..applied_matrix.cols {
+            applied_matrix.entries[i][j] = applied_func(matrix.entries[i][j]);
+        }
+    }
+
+    applied_matrix
+}
