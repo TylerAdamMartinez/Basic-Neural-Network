@@ -1,5 +1,7 @@
 use crate::image::Image;
-use crate::matrix::Matrix;
+use crate::matrix::{
+    apply, dot_product, flatten_matrix, randomize_matrix, transpose, Matrix, Vector,
+};
 
 pub fn sigmoid(input: f64) -> f64 {
     todo!()
@@ -14,12 +16,12 @@ pub fn soft_max(matrix: &Matrix) -> Matrix {
 }
 
 pub struct NeuralNetwork {
-    input: i32,
-    hidden: i32,
-    output: i32,
+    input: usize,
+    hidden: usize,
+    output: usize,
     learning_rate: f64,
-    hidden_weights: Option<Matrix>,
-    output_weights: Option<Matrix>,
+    hidden_weights: Matrix,
+    output_weights: Matrix,
 }
 
 impl std::fmt::Display for NeuralNetwork {
@@ -33,28 +35,64 @@ impl std::fmt::Display for NeuralNetwork {
 }
 
 impl NeuralNetwork {
-    pub fn new(input: i32, hidden: i32, output: i32, learning_rate: f64) -> Self {
+    pub fn new(input: usize, hidden: usize, output: usize, learning_rate: f64) -> Self {
+        let mut hidden_matrix = Matrix::new(hidden, input);
+        let mut output_matrix = Matrix::new(output, hidden);
+
+        randomize_matrix(&mut hidden_matrix, hidden as u64);
+        randomize_matrix(&mut output_matrix, output as u64);
+
         Self {
             input,
             hidden,
             output,
             learning_rate,
-            hidden_weights: None,
-            output_weights: None,
+            hidden_weights: hidden_matrix,
+            output_weights: output_matrix,
         }
     }
 
-    pub fn add_hidden_weights(&mut self, hidden_weights: Matrix) {
-        self.hidden_weights = Some(hidden_weights);
+    pub fn train(&mut self, input_data: &Matrix, output_data: &Matrix) {
+        // Feed
+        let hidden_inputs = dot_product(&self.hidden_weights, input_data);
+        let hidden_outputs = apply(sigmoid, &hidden_inputs);
+        let final_inputs = dot_product(&self.output_weights, &hidden_outputs);
+        let final_outputs = apply(sigmoid, &final_inputs);
+
+        // Errors
+        let output_errors = output_data.clone() - final_outputs.clone();
+        let hidden_errors = dot_product(&transpose(&self.output_weights), &output_errors);
+
+        // Backprograte output_weights
+        let mut sigmoid_prime_matrix = sigmoid_prime(&final_outputs);
+        let mut multiplied_matrix = output_errors.clone() * sigmoid_prime_matrix;
+        let mut transpose_matrix = transpose(&hidden_outputs);
+        let mut dot_product_matrix = dot_product(&multiplied_matrix, &transpose_matrix);
+        let mut scaled_matrix = dot_product_matrix.clone();
+        scaled_matrix.scale(self.learning_rate);
+        let mut added_matrix = self.output_weights.clone() + dot_product_matrix;
+        self.output_weights = added_matrix;
+
+        // Backprograte hidden_weights
+        sigmoid_prime_matrix = sigmoid_prime(&hidden_outputs);
+        multiplied_matrix = hidden_errors * sigmoid_prime_matrix;
+        transpose_matrix = transpose(&input_data);
+        dot_product_matrix = dot_product(&multiplied_matrix, &transpose_matrix);
+        scaled_matrix = dot_product_matrix.clone();
+        scaled_matrix.scale(self.learning_rate);
+
+        added_matrix = self.hidden_weights.clone() + dot_product_matrix;
+        self.hidden_weights = added_matrix;
     }
 
-    pub fn add_output_weights(&mut self, output_weights: Matrix) {
-        self.output_weights = Some(output_weights);
+    pub fn train_batch_images(&mut self, images: &Vec<Image>) {
+        for image in images {
+            let image_data = flatten_matrix(&image.img_data, Vector::Column);
+            let mut output = Matrix::new(10, 1);
+            output.entries[image.label][0] = 1.0;
+            self.train(&image_data, &output);
+        }
     }
-
-    pub fn train(&mut self, input_data: &Matrix, output_data: &Matrix) {}
-
-    pub fn train_batch_images(&mut self, images: &Vec<Image>) {}
 
     pub fn predict(&mut self, input_matrix: &Matrix) -> Matrix {
         todo!()
