@@ -2,8 +2,8 @@ use crate::matrix::Matrix;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Image {
-    img_data: Matrix,
-    label: usize,
+    pub img_data: Matrix,
+    pub label: usize,
 }
 
 impl std::fmt::Display for Image {
