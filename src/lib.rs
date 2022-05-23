@@ -72,6 +72,24 @@ impl std::ops::Mul for Matrix {
     }
 }
 
+pub fn dot_product(mat0: &Matrix, mat1: &Matrix) -> Matrix {
+    if mat0.cols == mat1.rows {
+        panic!("The column size of the first matrix must match the row size of the second matrix");
+    }
+
+    let mut build_matrix = Matrix::new(mat0.rows, mat1.cols);
+    for i in 0..mat0.rows {
+        for j in 0..mat1.cols {
+            let mut sum: f64 = 0.0;
+            for k in 0..mat1.rows {
+                sum += mat0.entries[i][k] * mat1.entries[k][j];
+            }
+            build_matrix.entries[i][j] = sum;
+        }
+    }
+    build_matrix
+}
+
 #[cfg(test)]
 mod matrix_ops_tests {
     use super::*;
@@ -124,6 +142,20 @@ mod matrix_ops_tests {
         mul1_matrix.fill(3.0);
 
         let sum_matrix = mul1_matrix * mul0_matrix;
+        assert_eq!(ctrl_matrix, sum_matrix);
+    }
+
+    #[test]
+    fn dot() {
+        let mut ctrl_matrix = Matrix::new(3, 3);
+        ctrl_matrix.fill(15.0);
+
+        let mut mul0_matrix = Matrix::new(1, 3);
+        mul0_matrix.fill(5.0);
+        let mut mul1_matrix = Matrix::new(3, 5);
+        mul1_matrix.fill(3.0);
+
+        let sum_matrix = dot_product(&mul1_matrix, &mul0_matrix);
         assert_eq!(ctrl_matrix, sum_matrix);
     }
 }
