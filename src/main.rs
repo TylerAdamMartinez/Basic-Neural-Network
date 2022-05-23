@@ -1,3 +1,4 @@
+mod image;
 mod matrix;
 mod neural;
 
