@@ -1,8 +1,8 @@
 #[derive(Debug, Clone, PartialEq)]
 pub struct Matrix {
     pub entries: Vec<Vec<f64>>,
-    rows: usize,
-    cols: usize,
+    pub rows: usize,
+    pub cols: usize,
 }
 
 impl std::fmt::Display for Matrix {
