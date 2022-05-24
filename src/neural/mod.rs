@@ -113,15 +113,27 @@ impl NeuralNetwork {
     }
 
     pub fn predict(&mut self, input_matrix: &Matrix) -> Matrix {
-        todo!()
+        let hidden_inputs = dot_product(&self.hidden_weights, &input_matrix);
+        let hidden_outputs = apply(sigmoid, &hidden_inputs);
+        let final_inputs = dot_product(&self.output_weights, &hidden_outputs);
+        let final_outputs = apply(sigmoid, &final_inputs);
+        soft_max(&final_outputs)
     }
 
     pub fn predict_image(&mut self, image: &Image) -> Matrix {
-        todo!()
+        let image_data = flatten_matrix(&image.img_data, Vector::Column);
+        self.predict(&image_data)
     }
 
     pub fn predict_images(&mut self, images: &Vec<Image>) -> f64 {
-        todo!()
+        let mut number_of_corrent_determinations: usize = 0;
+        for image in images {
+            let prediction = self.predict_image(&image);
+            if prediction.max_value().0 == image.label {
+                number_of_corrent_determinations += 1;
+            }
+        }
+        1.0 * number_of_corrent_determinations as f64 / images.len() as f64
     }
 }
 
