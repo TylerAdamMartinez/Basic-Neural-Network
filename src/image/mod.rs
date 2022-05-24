@@ -67,6 +67,7 @@ pub fn csv_to_images(file_path: &str) -> Result<Vec<Image>, String> {
     let mut build_row = Vec::<f64>::new();
     let mut count: usize = 0;
     for line in file_buffer.lines() {
+        build_matrix.clear();
         build_row.clear();
         for value in line.unwrap().split(',') {
             let parsed_value = match value.parse::<f64>() {
