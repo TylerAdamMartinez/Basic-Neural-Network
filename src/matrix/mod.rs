@@ -201,7 +201,7 @@ impl Matrix {
         }
     }
 
-    fn load(entries: Vec<Vec<f64>>) -> Result<Self, String> {
+    pub fn build_from_matrix(entries: Vec<Vec<f64>>) -> Result<Self, String> {
         if entries.is_empty() {
             return Err("Cannot load an empty matrix".to_string());
         }
@@ -311,7 +311,7 @@ mod matrix_methods_tests {
     }
 
     #[test]
-    fn load() {
+    fn build_from_matrix() {
         let mut new_matix = Matrix::new(5, 7);
         new_matix.fill(0.5);
 
@@ -325,7 +325,7 @@ mod matrix_methods_tests {
             ctrl_entries.push(ctrl_vec.clone());
         }
 
-        let ctrl_matrix = Matrix::load(ctrl_entries).unwrap();
+        let ctrl_matrix = Matrix::build_from_matrix(ctrl_entries).unwrap();
         assert_eq!(new_matix, ctrl_matrix);
     }
 
@@ -353,7 +353,7 @@ mod matrix_methods_tests {
             ctrl_entries.push(ctrl_vec.clone());
         }
 
-        let ctrl_matrix = Matrix::load(ctrl_entries).unwrap();
+        let ctrl_matrix = Matrix::build_from_matrix(ctrl_entries).unwrap();
 
         assert_eq!(ctrl_matrix.max_value(), (4, 3));
     }
@@ -428,7 +428,7 @@ pub fn load_matrix(file_name: &str) -> Result<Matrix, String> {
         build_matrix.push(build_row.clone());
     }
 
-    let new_matix = Matrix::load(build_matrix).unwrap();
+    let new_matix = Matrix::build_from_matrix(build_matrix).unwrap();
     Ok(new_matix)
 }
 
