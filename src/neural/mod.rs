@@ -4,15 +4,33 @@ use crate::matrix::{
 };
 
 pub fn sigmoid(input: f64) -> f64 {
-    todo!()
+    1.0 / (1.0 + (-1.0 * input).exp())
 }
 
 pub fn sigmoid_prime(matrix: &Matrix) -> Matrix {
-    todo!()
+    let mut ones_matrix = Matrix::new(matrix.rows, matrix.cols);
+    ones_matrix.fill(1.0);
+    let subtracted_matrix = ones_matrix - matrix.clone();
+    let multiplied_matrix = matrix.clone() * subtracted_matrix;
+    multiplied_matrix
 }
 
 pub fn soft_max(matrix: &Matrix) -> Matrix {
-    todo!()
+    let mut total: f64 = 0.0;
+    for i in 0..matrix.rows {
+        for j in 0..matrix.cols {
+            total += matrix.entries[i][j].exp();
+        }
+    }
+
+    let mut soft_max_matrix = Matrix::new(matrix.rows, matrix.cols);
+    for i in 0..matrix.rows {
+        for j in 0..matrix.cols {
+            soft_max_matrix.entries[i][j] = matrix.entries[i][j].exp() / total;
+        }
+    }
+
+    soft_max_matrix
 }
 
 pub struct NeuralNetwork {
