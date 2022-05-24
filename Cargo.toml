@@ -1,5 +1,10 @@
 [package]
-name = "matrix_math"
+name = "basic_neural_network"
+documentation = "This repo contains the code for a basic neural network written in rust."
+repository = "https://github.com/TylerAdamMartinez/Basic-Neural-Network"
+license = "GPL-2.0"
+license-file = "LICENSE"
+readme = "README.md"
 version = "0.1.0"
 edition = "2021"
 
