@@ -72,6 +72,7 @@ impl std::ops::Mul for Matrix {
     }
 }
 
+#[warn(dead_code)]
 pub fn dot_product(mat0: &Matrix, mat1: &Matrix) -> Matrix {
     if mat0.cols == mat1.rows {
         panic!("The column size of the first matrix must match the row size of the second matrix");
@@ -434,13 +435,27 @@ pub fn load_matrix(file_name: &str) -> Result<Matrix, String> {
 
 #[cfg(test)]
 mod matrix_files_tests {
-    //use super::*;
+    use super::*;
 
     #[test]
-    fn save() {}
+    fn save() {
+        let mut ctrl_matrix = Matrix::new(10, 15);
+        ctrl_matrix.fill(99.99);
+
+        save_matrix(&ctrl_matrix, &"./src/matrix/TEST_FILE_save_matrix.txt").unwrap();
+        let new_matrix = load_matrix(&"./src/matrix/TEST_FILE_save_matrix.txt").unwrap();
+
+        assert_eq!(new_matrix, ctrl_matrix);
+    }
 
     #[test]
-    fn load() {}
+    fn load() {
+        let mut ctrl_matrix = Matrix::new(15, 7);
+        ctrl_matrix.fill(0.37);
+
+        let new_matrix = load_matrix(&"./src/matrix/TEST_FILE_load_matrix.txt").unwrap();
+        assert_eq!(new_matrix, ctrl_matrix);
+    }
 }
 
 fn uniform_distribution(low: f64, high: f64) -> f64 {
