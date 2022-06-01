@@ -548,8 +548,41 @@ mod matrix_flatten_and_apply_tests {
     use super::*;
 
     #[test]
-    fn flatten_matrix_test() {}
+    fn flatten_matrix_column_test() {
+        let mut starting_matrix = Matrix::new(4, 5);
+        starting_matrix.fill(88.8);
+        let flatten_matrix = flatten_matrix(&starting_matrix, Vector::Column);
+
+        let mut ctrl_matrix = Matrix::new(1, 20);
+        ctrl_matrix.fill(88.8);
+
+        assert_eq!(flatten_matrix, ctrl_matrix);
+    }
 
     #[test]
-    fn apply_matrix_test() {}
+    fn flatten_matrix_row_test() {
+        let mut starting_matrix = Matrix::new(5, 4);
+        starting_matrix.fill(7.9);
+        let flatten_matrix = flatten_matrix(&starting_matrix, Vector::Row);
+
+        let mut ctrl_matrix = Matrix::new(20, 1);
+        ctrl_matrix.fill(7.9);
+
+        assert_eq!(flatten_matrix, ctrl_matrix);
+    }
+
+    #[test]
+    fn apply_matrix_test() {
+        fn local_test_func(num: f64) -> f64 {
+            num * 5.00
+        }
+
+        let mut starting_matrix = Matrix::new(5, 5);
+        starting_matrix.fill(9.00);
+        let applied_matrix = apply(local_test_func, &starting_matrix);
+        let mut ctrl_matrix = Matrix::new(5, 5);
+        ctrl_matrix.fill(45.00);
+
+        assert_eq!(ctrl_matrix, applied_matrix);
+    }
 }
