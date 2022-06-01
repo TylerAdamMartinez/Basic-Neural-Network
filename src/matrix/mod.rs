@@ -1,8 +1,8 @@
 #[derive(Debug, Clone, PartialEq)]
 pub struct Matrix {
-    entries: Vec<Vec<f64>>,
-    rows: usize,
-    cols: usize,
+    pub entries: Vec<Vec<f64>>,
+    pub rows: usize,
+    pub cols: usize,
 }
 
 impl std::fmt::Display for Matrix {
@@ -72,6 +72,7 @@ impl std::ops::Mul for Matrix {
     }
 }
 
+#[warn(dead_code)]
 pub fn dot_product(mat0: &Matrix, mat1: &Matrix) -> Matrix {
     if mat0.cols == mat1.rows {
         panic!("The column size of the first matrix must match the row size of the second matrix");
@@ -201,7 +202,7 @@ impl Matrix {
         }
     }
 
-    fn load(entries: Vec<Vec<f64>>) -> Result<Self, String> {
+    pub fn build_from_matrix(entries: Vec<Vec<f64>>) -> Result<Self, String> {
         if entries.is_empty() {
             return Err("Cannot load an empty matrix".to_string());
         }
@@ -311,7 +312,7 @@ mod matrix_methods_tests {
     }
 
     #[test]
-    fn load() {
+    fn build_from_matrix() {
         let mut new_matix = Matrix::new(5, 7);
         new_matix.fill(0.5);
 
@@ -325,7 +326,7 @@ mod matrix_methods_tests {
             ctrl_entries.push(ctrl_vec.clone());
         }
 
-        let ctrl_matrix = Matrix::load(ctrl_entries).unwrap();
+        let ctrl_matrix = Matrix::build_from_matrix(ctrl_entries).unwrap();
         assert_eq!(new_matix, ctrl_matrix);
     }
 
@@ -353,7 +354,7 @@ mod matrix_methods_tests {
             ctrl_entries.push(ctrl_vec.clone());
         }
 
-        let ctrl_matrix = Matrix::load(ctrl_entries).unwrap();
+        let ctrl_matrix = Matrix::build_from_matrix(ctrl_entries).unwrap();
 
         assert_eq!(ctrl_matrix.max_value(), (4, 3));
     }
@@ -428,19 +429,33 @@ pub fn load_matrix(file_name: &str) -> Result<Matrix, String> {
         build_matrix.push(build_row.clone());
     }
 
-    let new_matix = Matrix::load(build_matrix).unwrap();
+    let new_matix = Matrix::build_from_matrix(build_matrix).unwrap();
     Ok(new_matix)
 }
 
 #[cfg(test)]
 mod matrix_files_tests {
-    //use super::*;
+    use super::*;
 
     #[test]
-    fn save() {}
+    fn save() {
+        let mut ctrl_matrix = Matrix::new(10, 15);
+        ctrl_matrix.fill(99.99);
+
+        save_matrix(&ctrl_matrix, &"./src/matrix/TEST_FILE_save_matrix.txt").unwrap();
+        let new_matrix = load_matrix(&"./src/matrix/TEST_FILE_save_matrix.txt").unwrap();
+
+        assert_eq!(new_matrix, ctrl_matrix);
+    }
 
     #[test]
-    fn load() {}
+    fn load() {
+        let mut ctrl_matrix = Matrix::new(15, 7);
+        ctrl_matrix.fill(0.37);
+
+        let new_matrix = load_matrix(&"./src/matrix/TEST_FILE_load_matrix.txt").unwrap();
+        assert_eq!(new_matrix, ctrl_matrix);
+    }
 }
 
 fn uniform_distribution(low: f64, high: f64) -> f64 {
@@ -508,4 +523,16 @@ pub fn flatten_matrix(matrix: &Matrix, flag: Vector) -> Matrix {
             return flatten_matrix;
         }
     };
+}
+
+pub fn apply(applied_func: fn(f64) -> f64, matrix: &Matrix) -> Matrix {
+    let mut applied_matrix = matrix.clone();
+
+    for i in 0..applied_matrix.rows {
+        for j in 0..applied_matrix.cols {
+            applied_matrix.entries[i][j] = applied_func(matrix.entries[i][j]);
+        }
+    }
+
+    applied_matrix
 }

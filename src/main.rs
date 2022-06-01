@@ -1,8 +1,10 @@
+mod image;
 mod matrix;
+mod neural;
 
 fn main() {
     //build matrix funcs
-    let mut new_matrix = matrix::Matrix::new(1_000, 1_000);
+    let mut new_matrix = matrix::Matrix::new(10, 10);
     matrix::randomize_matrix(&mut new_matrix, 99);
     println!("matrix after randomize_matrix\n{}", new_matrix);
 
