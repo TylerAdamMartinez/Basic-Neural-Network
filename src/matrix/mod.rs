@@ -72,7 +72,6 @@ impl std::ops::Mul for Matrix {
     }
 }
 
-#[warn(dead_code)]
 pub fn dot_product(mat0: &Matrix, mat1: &Matrix) -> Matrix {
     if mat0.cols == mat1.rows {
         panic!("The column size of the first matrix must match the row size of the second matrix");
@@ -209,6 +208,13 @@ impl Matrix {
 
         let rows: usize = entries.len();
         let cols: usize = entries[0].len();
+
+        for i in 1..entries.len() {
+            if entries[i].len() != cols {
+                return Err("All cols lengths must be the same size".to_string());
+            }
+        }
+
         Ok(Self {
             entries,
             rows,
@@ -535,4 +541,15 @@ pub fn apply(applied_func: fn(f64) -> f64, matrix: &Matrix) -> Matrix {
     }
 
     applied_matrix
+}
+
+#[cfg(test)]
+mod matrix_flatten_and_apply_tests {
+    use super::*;
+
+    #[test]
+    fn flatten_matrix_test() {}
+
+    #[test]
+    fn apply_matrix_test() {}
 }
