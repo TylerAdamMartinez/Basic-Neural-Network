@@ -54,19 +54,19 @@ impl std::fmt::Display for NeuralNetwork {
 
 impl NeuralNetwork {
     pub fn new(input: usize, hidden: usize, output: usize, learning_rate: f64) -> Self {
-        let mut hidden_matrix = Matrix::new(hidden, input);
-        let mut output_matrix = Matrix::new(output, hidden);
+        let mut hidden_weights = Matrix::new(hidden, input);
+        let mut output_weights = Matrix::new(output, hidden);
 
-        randomize_matrix(&mut hidden_matrix, hidden as u64);
-        randomize_matrix(&mut output_matrix, output as u64);
+        randomize_matrix(&mut hidden_weights, hidden as u64);
+        randomize_matrix(&mut output_weights, output as u64);
 
         Self {
             input,
             hidden,
             output,
             learning_rate,
-            hidden_weights: hidden_matrix,
-            output_weights: output_matrix,
+            hidden_weights,
+            output_weights,
         }
     }
 
